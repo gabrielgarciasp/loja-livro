@@ -1,5 +1,6 @@
 package com.lojalivro.service
 
+import com.lojalivro.enums.CustomerStatus
 import com.lojalivro.model.CustomerModel
 import com.lojalivro.repository.CustomerRepository
 import org.springframework.stereotype.Service
@@ -7,7 +8,8 @@ import java.lang.Exception
 
 @Service
 class CustomerService(
-    val customerRepository: CustomerRepository
+    val customerRepository: CustomerRepository,
+    val bookService: BookService
 ) {
 
     fun getAll(name: String?): List<CustomerModel> {
@@ -17,7 +19,7 @@ class CustomerService(
         return customerRepository.findAll().toList()
     }
 
-    fun getCustomer(id: Int): CustomerModel {
+    fun findById(id: Int): CustomerModel {
         return customerRepository.findById(id).orElseThrow()
     }
 
@@ -34,10 +36,10 @@ class CustomerService(
     }
 
     fun delete(id: Int) {
-        if(!customerRepository.existsById(id)) {
-            throw Exception()
-        }
+        val customer = findById(id)
+        bookService.deleteByCustomer(customer)
 
-        customerRepository.deleteById(id)
+        customer.status = CustomerStatus.INATIVO
+        customerRepository.save(customer)
     }
 }
