@@ -1,6 +1,8 @@
 package com.lojalivro.service
 
 import com.lojalivro.enums.CustomerStatus
+import com.lojalivro.enums.Errors
+import com.lojalivro.exception.NotFoundException
 import com.lojalivro.model.CustomerModel
 import com.lojalivro.repository.CustomerRepository
 import org.springframework.stereotype.Service
@@ -20,7 +22,8 @@ class CustomerService(
     }
 
     fun findById(id: Int): CustomerModel {
-        return customerRepository.findById(id).orElseThrow()
+        return customerRepository.findById(id)
+            .orElseThrow { NotFoundException(Errors.ML201.message.format(id), Errors.ML201.code) }
     }
 
     fun create(customer: CustomerModel) {

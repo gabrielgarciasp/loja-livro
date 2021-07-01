@@ -1,6 +1,8 @@
 package com.lojalivro.service
 
 import com.lojalivro.enums.BookStatus
+import com.lojalivro.enums.Errors
+import com.lojalivro.exception.NotFoundException
 import com.lojalivro.model.BookModel
 import com.lojalivro.model.CustomerModel
 import com.lojalivro.repository.BookRepository
@@ -26,7 +28,8 @@ class BookService(
     }
 
     fun findById(id: Int): BookModel {
-        return bookRepository.findById(id).orElseThrow()
+        return bookRepository.findById(id)
+            .orElseThrow{ NotFoundException(Errors.ML101.message.format(id), Errors.ML101.code) }
     }
 
     fun update(book: BookModel) {

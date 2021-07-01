@@ -1,6 +1,8 @@
 package com.lojalivro.model
 
 import com.lojalivro.enums.BookStatus
+import com.lojalivro.enums.Errors
+import com.lojalivro.exception.BadRequestException
 import java.lang.Exception
 import java.math.BigDecimal
 import javax.persistence.*
@@ -23,7 +25,7 @@ data class BookModel(
     var status: BookStatus? = null
         set(value) {
             if (field == BookStatus.CANCELADO || field == BookStatus.DELETADO) {
-                throw Exception("Não é possível alterar um livro com status $field")
+                throw BadRequestException(Errors.ML102.message.format(field), Errors.ML102.code)
             }
             field = value
         }
