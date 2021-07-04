@@ -2,6 +2,7 @@ package com.lojalivro.service
 
 import com.lojalivro.enums.BookStatus
 import com.lojalivro.enums.Errors
+import com.lojalivro.exception.BookNotAvailabilityException
 import com.lojalivro.exception.NotFoundException
 import com.lojalivro.model.BookModel
 import com.lojalivro.model.CustomerModel
@@ -48,5 +49,30 @@ class BookService(
             book.status = BookStatus.DELETADO
         }
         bookRepository.saveAll(books)
+    }
+
+    fun findAllByIds(bookIds: Set<Int>): List<BookModel> {
+        return bookRepository.findAllById(bookIds).toList()
+    }
+
+    fun purchase(books: MutableList<BookModel>) {
+        books.map { it.status = BookStatus.VENDIDO }
+        bookRepository.saveAll(books)
+    }
+
+    fun checkAvailabilityBooks(books: MutableList<BookModel>) {
+        val booksNotAvailability = mutableListOf<Int>()
+        books.forEach {
+            if (it.status != BookStatus.ATIVO) {
+                booksNotAvailability.add(it.id!!)
+            }
+        }
+
+        if (booksNotAvailability.size > 0) {
+            throw BookNotAvailabilityException(
+                Errors.ML103.message.format(booksNotAvailability.joinToString(",")),
+                Errors.ML103.code
+            )
+        }
     }
 }
